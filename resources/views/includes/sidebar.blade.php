@@ -41,17 +41,20 @@
                         <li class="sidebar-item  has-sub">
                             <a href="#" class='sidebar-link'>
                                 <i class="bi bi-question-circle"></i>
-                                <span>Question</span>
+                                <span>Data Jawaban</span>
                             </a>
                             <ul class="submenu ">
                                 <li class="submenu-item ">
-                                    <a href="{{route('unit.index')}}">Unit</a>
+                                    <a href="{{route('allResponse')}}">Semua</a>
                                 </li>
                                 <li class="submenu-item ">
-                                    <a href="{{route('guru.index')}}">Guru</a>
+                                    <a href="{{route('sortBySma')}}">Per Unit SMA</a>
                                 </li>
                                 <li class="submenu-item ">
-                                    <a href="{{route('siswa.index')}}">Siswa</a>
+                                    <a href="{{route('sortBySmp')}}">Per Unit SMP</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{route('sortByEle')}}">Per Unit Elementary</a>
                                 </li>
                             </ul>
                         </li>

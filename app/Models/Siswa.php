@@ -13,4 +13,14 @@ class Siswa extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function penilaian()
+    {
+        return $this->hasMany(Pertanyaansiswa::class, 'siswa_id');
+    }
 }

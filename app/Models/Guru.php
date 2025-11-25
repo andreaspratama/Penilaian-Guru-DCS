@@ -13,4 +13,9 @@ class Guru extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function penilaian()
+    {
+        return $this->hasMany(Pertanyaansiswa::class, 'siswa_id');
+    }
 }

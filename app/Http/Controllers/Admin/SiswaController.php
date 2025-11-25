@@ -71,27 +71,28 @@ class SiswaController extends Controller
             'password'   => 'required|string|max:255',
         ]);
 
-        // Simpan siswa ke tabel siswa
+        // 1. Simpan user dulu
+        $user = User::create([
+            'name'     => $validated['nama'],
+            'email'    => $validated['username'], // username jadi login
+            'password' => Hash::make($validated['password']),
+            'role'     => 'siswa',
+        ]);
+
+        // 2. Simpan siswa dengan user_id
         $siswa = Siswa::create([
             'unit_id'  => $validated['unit_id'],
             'nama'     => $validated['nama'],
             'kelas'    => $validated['kelas'],
             'username' => $validated['username'],
-            'password' => Hash::make($validated['password']), // simpan password hashed
-        ]);
-
-        // Tambahkan ke tabel users untuk login
-        User::create([
-            'name'     => $validated['nama'],
-            'email'    => $validated['username'], // langsung pakai username sebagai email
             'password' => Hash::make($validated['password']),
-            'role'     => 'siswa',
+            'user_id'  => $user->id,   // ← INI PENTING
         ]);
 
         return redirect()
             ->route('siswa.index')
             ->with('success', 'Data siswa & akun login berhasil ditambahkan!');
-        }
+    }
 
     /**
      * Display the specified resource.

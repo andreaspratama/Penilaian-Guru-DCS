@@ -32,10 +32,27 @@ Route::prefix('admin')
 
     // ROUTE SISWA
     Route::resource('siswa', SiswaController::class);
+
+    // ROUTE SEMUA JAWABAN
+    Route::get('all', [PertanyaanController::class, 'allResponse'])->name('allResponse');
+    // DETAIL JAWABAN
+    Route::get('responseDetail/{id}', [PertanyaanController::class, 'responseDetail'])->name('responseDetail');
+    // ROUTE PER UNIT SMA
+    Route::get('sortBySma', [PertanyaanController::class, 'sortBySma'])->name('sortBySma');
+    // ROUTE PER UNIT SMP
+    Route::get('sortBySmp', [PertanyaanController::class, 'sortBySmp'])->name('sortBySmp');
+    // ROUTE PER UNIT ELEMENTARY
+    Route::get('sortByEle', [PertanyaanController::class, 'sortByEle'])->name('sortByEle');
 });
 
 Route::prefix('student')
     ->middleware(['auth', 'role:siswa'])
     ->group(function () {
         Route::get('/', [PertanyaanController::class, 'index'])->name('dashboardSiswa');
+
+        // HALAMAN PENILAIAN GURU
+        Route::get('penilaianForm', [PertanyaanController::class, 'penilaianForm'])->name('penilaianForm');
+
+        // SIMPAN DATA PENILAIAN
+        Route::post('penilaianStore', [PertanyaanController::class, 'penilaianStore'])->name('penilaianStore');
 });
