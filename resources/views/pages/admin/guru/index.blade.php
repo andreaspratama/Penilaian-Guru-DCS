@@ -1,10 +1,30 @@
 @extends('layouts.admin')
 
 @section('content')
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {!! session('error') !!}
+        </div>
+    @endif
+
     <section class="section">
         <div class="card">
             <div class="card-header">
                 <a href="{{ route('guru.create') }}" class="btn btn-primary mb-3">+ Tambah Guru</a>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                + Tambah Guru Dengan Excel
+                </button>
 
                 @if(session('success'))
                     <script>
@@ -34,6 +54,28 @@
 
     </section>
 @endsection
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Import Data</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ route('guru.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-3">
+            <label for="formFile" class="form-label">Import File</label>
+            <input class="form-control" type="file" id="formFile" name="file">
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 @push('prepend-style')
     <style>
@@ -97,8 +139,8 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'nama', name: 'nama' },
                 { data: 'unit_nama', name: 'unit_nama' },
-                { data: 'kelas', name: 'kelas' },
-                { data: 'mapel', name: 'mapel' },
+                { data: 'kelas', name: 'kelas', orderable: false, searchable: false },
+                { data: 'mapel', name: 'mapel', orderable: false, searchable: false },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
             ]
         });

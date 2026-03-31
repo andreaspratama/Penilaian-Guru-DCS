@@ -34,8 +34,6 @@
 
     <div class="card-style">
 
-        <h3 class="text-center mb-4">Teacher Evaluation Form</h3>
-
         <!-- FORM MULAI -->
         <form action="{{route('penilaianStore')}}" method="POST">
             @csrf
@@ -50,7 +48,7 @@
 
             <!-- ====================== PAGE 1 ====================== -->
             <div id="page1" class="page active">
-
+                <h3 class="text-center mb-4">Teacher Evaluation Form</h3>
 
                 <!-- Q1 -->
                 <div class="mb-4">
@@ -92,20 +90,20 @@
                 <div class="mb-4">
                     <div class="question-title">4. I understand when he/she explains in English. <span class="required-icon">*</span></div>
                     <div class="d-flex flex-wrap">
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" required value="1"> Strongly disagree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" value="2"> Disagree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" value="3"> Agree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" value="4"> Strongly agree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" required value="1"> 1 Strongly disagree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" value="2"> 2 Disagree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" value="3"> 3 Agree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan4" value="4"> 4 Strongly agree</label>
                     </div>
                 </div>
 
                 <button type="button" class="btn btn-primary w-100 mt-4" onclick="nextPage()">Next →</button>
 
             </div>
-
+            
             <!-- ====================== PAGE 2 ====================== -->
             <div id="page2" class="page">
-
+                <h3 class="text-center mb-4">Self Evaluation Form</h3>
                 <!-- Q5 -->
                 <div class="mb-4">
                     <div class="question-title">5. I speak English with my friends in class. <span class="required-icon">*</span></div>
@@ -134,10 +132,10 @@
                 <div class="mb-4">
                     <div class="question-title">7. I feel confident speaking English at school. <span class="required-icon">*</span></div>
                     <div class="d-flex flex-wrap">
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" required value="1"> Strongly disagree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" value="2"> Disagree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" value="3"> Agree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" value="4"> Strongly agree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" required value="1"> 1 Strongly disagree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" value="2"> 2 Disagree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" value="3"> 3 Agree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan7" value="4"> 4 Strongly agree</label>
                     </div>
                 </div>
 
@@ -145,20 +143,24 @@
                 <div class="mb-4">
                     <div class="question-title">8. My English has improved because I am a DCS student. <span class="required-icon">*</span></div>
                     <div class="d-flex flex-wrap">
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" required value="1"> Strongly disagree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" value="2"> Disagree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" value="3"> Agree</label>
-                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" value="4"> Strongly agree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" required value="1"> 1 Strongly disagree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" value="2"> 2 Disagree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" value="3"> 3 Agree</label>
+                        <label class="custom-radio-option"><input type="radio" name="pertanyaan8" value="4"> 4 Strongly agree</label>
                     </div>
                 </div>
 
                 <!-- Q9 -->
-                <div class="mb-4">
+                <div class="mb-2">
                     <div class="question-title">9. Do you have ideas to improve English-speaking environment?</div>
                     <textarea name="pertanyaan9" class="form-control" rows="3" placeholder="Write your suggestion..."></textarea>
                 </div>
 
-                <div class="d-flex justify-content-between">
+                <span style="color: red">
+                    After submitting, you will return to main page to evaluate other teachers.
+                </span>
+
+                <div class="d-flex justify-content-between mt-3">
                     <button type="button" class="btn btn-secondary" onclick="prevPage()">← Back</button>
                     <button type="submit" class="btn btn-success">Submit</button>
                 </div>

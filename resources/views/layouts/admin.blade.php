@@ -22,7 +22,19 @@
             </header>
 
             <div class="page-heading">
-                <h3>Profile Statistics</h3>
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h3 class="mb-0">Dashboard</h3>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button class="btn btn-outline-danger">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
             @yield('content')
 

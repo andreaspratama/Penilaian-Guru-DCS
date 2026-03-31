@@ -44,25 +44,55 @@
                             @enderror
                         </div>
 
-                        {{-- KELAS --}}
+                        {{-- USERNAME --}}
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control @error('kelas') is-invalid @enderror"
-                                   name="kelas" value="{{ old('kelas', $guru->kelas) }}" placeholder="Kelas">
-                            <label>Kelas</label>
-                            @error('kelas')
+                            <input type="text"
+                                   class="form-control @error('username') is-invalid @enderror"
+                                   name="username" value="{{ old('username', $guru->username) }}" placeholder="Username">
+                            <label>Username</label>
+                            @error('username')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        {{-- MAPEL --}}
+                        {{-- PASSWORD --}}
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control @error('mapel') is-invalid @enderror"
-                                   name="mapel" value="{{ old('mapel', $guru->mapel) }}" placeholder="Mapel">
-                            <label>Mapel</label>
-                            @error('mapel')
+                            <input type="password"
+                                class="form-control @error('password') is-invalid @enderror"
+                                name="password"
+                                placeholder="Password">
+                            <label>Password (kosongkan jika tidak diubah)</label>
+                            @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <hr>
+                        <h6 class="mb-3">📚 Mapel & Kelas</h6>
+
+                        <div id="mapel-wrapper">
+
+                        @foreach ($guru->mapelKelas as $item)
+                            <div class="row mb-2 mapel-item">
+                                <div class="col-md-5">
+                                    <input type="text" name="mapel[]" class="form-control" value="{{ $item->mapel }}">
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" name="kelas[]" class="form-control" value="{{ $item->kelas }}">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusMapel(this)">
+                                        ❌
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        </div>
+
+                        <button type="button" onclick="tambahMapel()" class="btn btn-sm btn-outline-primary mt-2">
+                            ➕ Tambah Mapel
+                        </button>
 
                         {{-- BUTTON --}}
                         <div class="d-flex justify-content-between mt-4">
@@ -85,3 +115,30 @@
 
 </div>
 @endsection
+
+@push('addon-script')
+<script>
+    function tambahMapel() {
+        let html = `
+        <div class="row mb-2 mapel-item">
+            <div class="col-md-5">
+                <input type="text" name="mapel[]" class="form-control" placeholder="Mapel">
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="kelas[]" class="form-control" placeholder="Kelas">
+            </div>
+            <div class="col-md-2 d-flex align-items-center">
+                <button type="button" class="btn btn-danger btn-sm" onclick="hapusMapel(this)">
+                    ❌
+                </button>
+            </div>
+        </div>`;
+
+        document.getElementById('mapel-wrapper').insertAdjacentHTML('beforeend', html);
+    }
+
+    function hapusMapel(button) {
+        button.closest('.mapel-item').remove();
+    }
+</script>
+@endpush

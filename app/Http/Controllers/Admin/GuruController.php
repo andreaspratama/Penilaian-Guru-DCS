@@ -8,6 +8,11 @@ use App\Models\Unit;
 use App\Models\Guru;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Imports\GuruImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Models\GuruMapelKelas;
+use Illuminate\Support\Facades\DB;
 
 class GuruController extends Controller
 {
@@ -19,7 +24,7 @@ class GuruController extends Controller
         // Jika permintaan datang dari DataTables AJAX
         if ($request->ajax()) {
 
-            $data = Guru::with('unit')->orderBy('id', 'DESC'); // pakai query()
+            $data = Guru::with(['unit', 'mapelKelas'])->orderBy('id', 'DESC'); // pakai query()
 
             return datatables()->of($data)
                 ->addIndexColumn() // menambah nomor urut otomatis
@@ -41,7 +46,13 @@ class GuruController extends Controller
 
                     return $edit . ' ' . $hapus;
                 })
-                ->rawColumns(['unit_nama', 'aksi'])
+                ->addColumn('mapel', function ($row) {
+                    return $row->mapelKelas->pluck('mapel')->implode(', ');
+                })
+                ->addColumn('kelas', function ($row) {
+                    return $row->mapelKelas->pluck('kelas')->implode(', ');
+                })
+                ->rawColumns(['unit_nama', 'aksi', 'mapel', 'kelas'])
                 ->make(true);
         }
 
@@ -62,37 +73,53 @@ class GuruController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
+        // ✅ VALIDASI
         $validated = $request->validate([
-            'unit_id' => 'required|exists:units,id',
-            'nama'    => 'required|string|max:255',
-            'kelas'   => 'required|string|max:255',
-            'mapel'   => 'required|string|max:255',
-            'username'   => 'required|string|max:255|unique:gurus,username|unique:users,email',
-            'password'   => 'required|string|max:255',
+            'unit_id'   => 'required|exists:units,id',
+            'nama'      => 'required|string|max:255',
+            'username'  => 'required|string|max:255|unique:gurus,username|unique:users,email',
+            'password'  => 'required|string|max:255',
+
+            'mapel'     => 'required|array',
+            'mapel.*'   => 'required|string|max:255',
+            'kelas'     => 'required|array',
+            'kelas.*'   => 'required|string|max:255',
         ]);
 
-        // Simpan siswa ke tabel siswa
+        // ✅ SIMPAN GURU
         $guru = Guru::create([
             'unit_id'  => $validated['unit_id'],
             'nama'     => $validated['nama'],
-            'kelas'    => $validated['kelas'],
-            'mapel'    => $validated['mapel'],
             'username' => $validated['username'],
-            'password' => Hash::make($validated['password']), // simpan password hashed
+            'password' => Hash::make($validated['password']),
         ]);
 
-        // Tambahkan ke tabel users untuk login
+        // ✅ SIMPAN MULTI MAPEL & KELAS
+        foreach ($validated['mapel'] as $key => $mapel) {
+
+            // safety biar gak error index
+            if (!isset($validated['kelas'][$key])) {
+                continue;
+            }
+
+            GuruMapelKelas::create([
+                'guru_id' => $guru->id,
+                'mapel'   => $mapel,
+                'kelas'   => $validated['kelas'][$key],
+            ]);
+        }
+
+        // ✅ BUAT USER LOGIN
         User::create([
             'name'     => $validated['nama'],
-            'email'    => $validated['username'], // langsung pakai username sebagai email
+            'email'    => $validated['username'],
             'password' => Hash::make($validated['password']),
             'role'     => 'guru',
         ]);
 
         return redirect()
             ->route('guru.index')
-            ->with('success', 'Data guru & akun login berhasil ditambahkan!');
+            ->with('success', 'Data guru & mapel berhasil ditambahkan!');
     }
 
     /**
@@ -108,8 +135,8 @@ class GuruController extends Controller
      */
     public function edit(string $id)
     {
-        $guru = Guru::findOrFail($id);
-        $units = Unit::orderBy('nama')->get();
+        $guru = Guru::with('mapelKelas')->findOrFail($id);
+        $units = Unit::all();
 
         return view('pages.admin.guru.edit', compact('guru', 'units'));
     }
@@ -119,49 +146,85 @@ class GuruController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Validasi input
-        $request->validate([
-            'nama' => 'required|string|max:100',
-            'username' => 'required|string|max:100',
-            'password' => 'nullable|string|max:100',
-            'mapel'  => 'nullable|string|max:30',
-            'kelas'  => 'nullable|string|max:30',
-            'unit_id' => 'nullable|exists:units,id',
-        ], [
-            'nama.required' => 'Nama guru wajib diisi.',
-            'username.required' => 'Username guru wajib diisi.',
-            'kelas.required' => 'Kelas wajib diisi.',
-            'mapel.required' => 'Mapel wajib diisi.',
-        ]);
-
-        // Ambil data guru lama
         $guru = Guru::findOrFail($id);
 
-        // UPDATE USER LOGIN (di tabel users)
-        $user = User::where('email', $guru->username)->first(); // email = username lama
+        // ✅ VALIDASI
+        $validated = $request->validate([
+            'unit_id'   => 'required|exists:units,id',
+            'nama'      => 'required|string|max:255',
+            'username'  => 'required|string|max:255|unique:gurus,username,' . $guru->id . '|unique:users,email,' . $guru->username . ',email',
+            'password'  => 'nullable|string|min:6',
 
-        if ($user) {
-            $user->update([
-                'name'  => $request->nama,
-                'email' => $request->username,
-                'password' => $request->password 
-                    ? Hash::make($request->password) 
-                    : $user->password, // kalau password kosong, pakai yang lama
-            ]);
-        }
-
-        // UPDATE DATA GURU
-        $guru->update([
-            'nama' => $request->nama,
-            'kelas' => $request->kelas,
-            'username' => $request->username,
-            'mapel' => $request->mapel,
-            'password' => $request->password ?: $guru->password, 
-            'unit_id' => $request->unit_id,
+            'mapel'     => 'required|array',
+            'mapel.*'   => 'required|string|max:255',
+            'kelas'     => 'required|array',
+            'kelas.*'   => 'required|string|max:255',
         ]);
 
-        return redirect()->route('guru.index')
-            ->with('success', 'Data guru berhasil diperbarui!');
+        DB::beginTransaction();
+
+        try {
+
+            // ✅ UPDATE DATA GURU
+            $dataGuru = [
+                'unit_id'  => $validated['unit_id'],
+                'nama'     => $validated['nama'],
+                'username' => $validated['username'],
+            ];
+
+            // kalau password diisi
+            if ($request->filled('password')) {
+                $dataGuru['password'] = Hash::make($request->password);
+            }
+
+            $guru->update($dataGuru);
+
+            // ✅ HAPUS MAPEL LAMA
+            GuruMapelKelas::where('guru_id', $guru->id)->delete();
+
+            // ✅ INSERT ULANG MAPEL & KELAS
+            foreach ($validated['mapel'] as $key => $mapel) {
+
+                if (!isset($validated['kelas'][$key])) continue;
+
+                GuruMapelKelas::create([
+                    'guru_id' => $guru->id,
+                    'mapel'   => $mapel,
+                    'kelas'   => $validated['kelas'][$key],
+                ]);
+            }
+
+            // ✅ UPDATE USER LOGIN (SINKRON)
+            $user = User::where('email', $guru->getOriginal('username'))->first();
+
+            if ($user) {
+
+                $dataUser = [
+                    'name'  => $validated['nama'],
+                    'email' => $validated['username'],
+                ];
+
+                if ($request->filled('password')) {
+                    $dataUser['password'] = Hash::make($request->password);
+                }
+
+                $user->update($dataUser);
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('guru.index')
+                ->with('success', 'Data guru berhasil diupdate!');
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()
+                ->with('error', 'Gagal update data!')
+                ->withInput();
+        }
     }
 
     /**
@@ -176,5 +239,33 @@ class GuruController extends Controller
             'status' => 'success',
             'message' => 'Unit berhasil dihapus'
         ]);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+
+            Excel::import(new GuruImport, $request->file('file'));
+
+            return back()->with('success', 'Import berhasil!');
+
+        } catch (ValidationException $e) {
+
+            $errors = [];
+
+            foreach ($e->failures() as $failure) {
+                $errors[] = "Baris ke-".$failure->row()." | ".$failure->errors()[0];
+            }
+
+            return back()->with('error', implode('<br>', $errors));
+
+        } catch (\Throwable $e) {
+
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 }

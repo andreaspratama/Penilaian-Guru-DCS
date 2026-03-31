@@ -55,10 +55,14 @@
 <div class="container" style="max-width: 600px;">
     <div class="card shadow border-0 p-4">
 
-        <h3 class="text-center mb-3 fw-bold">Choose Teacher</h3>
+        <h3 class="text-center mb-3 fw-bold">Teacher Evalutation Form</h3>
 
-        <p class="text-center text-muted" style="font-size: 14px;">
+        <p class="text-center text-muted" style="font-size: 16px;">
             Please select the teacher you would like to evaluate.
+        </p>
+
+        <p class="text-center" style="font-size: 16px; color: red;">
+            You must evaluate all the teachers.
         </p>
 
         <form action="{{ route('penilaianForm') }}" method="GET">
@@ -70,7 +74,7 @@
 
                     @foreach ($gurus as $g)
                         <option value="{{ $g->id }}">
-                            {{ $g->nama }} — {{ $g->mapel }}
+                            {{ $g->nama }}
                         </option>
                     @endforeach
 
@@ -78,7 +82,7 @@
             </div>
 
             <button class="btn btn-primary w-100 py-2 fw-semibold">
-                Start the assessment
+                Start
             </button>
         </form>
 

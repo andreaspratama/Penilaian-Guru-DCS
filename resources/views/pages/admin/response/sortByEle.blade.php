@@ -22,9 +22,7 @@ type="hidden"@extends('layouts.admin')
                         <tr>
                             <th>No</th>
                             <th>Nama Guru</th>
-                            <th>Nama Siswa</th>
                             <th>Unit</th>
-                            <th>Kelas</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -95,10 +93,8 @@ type="hidden"@extends('layouts.admin')
             ],
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'guru_nama', name: 'guru_nama' },
-                { data: 'siswa_nama', name: 'siswa_nama' },
-                { data: 'unit', name: 'unit' },
-                { data: 'kelas', name: 'kelas' },
+                { data: 'nama', name: 'nama' },
+                { data: 'unit_nama', name: 'unit_nama' },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
             ]
         });

@@ -3,7 +3,7 @@
                 <div class="sidebar-header">
                     <div class="d-flex justify-content-between">
                         <div class="logo">
-                            <a href="index.html"><img src="{{url('./belakang/assets/images/logo/logo.png')}}" alt="Logo" srcset=""></a>
+                            <a href="{{route('dashboard')}}"><img src="{{url('./belakang/assets/images/logo/dcs.png')}}" alt="Logo" srcset="" style="display: flex; justify-content: center; align-items: center; width: 70px; height: 70px; "></a>
                         </div>
                         <div class="toggler">
                             <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
@@ -15,7 +15,7 @@
                         <li class="sidebar-title">Menu</li>
 
                         <li class="sidebar-item active ">
-                            <a href="index.html" class='sidebar-link'>
+                            <a href="{{route('dashboard')}}" class='sidebar-link'>
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Dashboard</span>
                             </a>

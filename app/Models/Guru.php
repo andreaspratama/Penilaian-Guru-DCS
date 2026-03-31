@@ -18,4 +18,9 @@ class Guru extends Model
     {
         return $this->hasMany(Pertanyaansiswa::class, 'siswa_id');
     }
+
+    public function mapelKelas()
+    {
+        return $this->hasMany(GuruMapelKelas::class);
+    }
 }

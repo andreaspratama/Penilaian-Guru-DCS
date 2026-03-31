@@ -28,7 +28,7 @@
                     <div class="col-md-4">
                         <div class="p-3 border rounded bg-light">
                             <small class="text-muted">Guru Dinilai</small>
-                            <div class="fw-bold fs-5">{{ $data->guru->nama }} ({{ $data->guru->mapel }})</div>
+                            <div class="fw-bold fs-5">{{ $data->guru->nama }}</div>
                         </div>
                     </div>
 

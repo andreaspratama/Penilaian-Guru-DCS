@@ -43,29 +43,7 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
-                        {{-- KELAS --}}
-                        <div class="form-floating mb-3">
-                            <input type="text" 
-                                   class="form-control @error('kelas') is-invalid @enderror"
-                                   name="kelas" value="{{ old('kelas') }}" placeholder="Kelas">
-                            <label>Kelas</label>
-                            @error('kelas')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- MAPEL --}}
-                        <div class="form-floating mb-3">
-                            <input type="text"
-                                   class="form-control @error('mapel') is-invalid @enderror"
-                                   name="mapel" value="{{ old('mapel') }}" placeholder="Mapel">
-                            <label>Mata Pelajaran</label>
-                            @error('mapel')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
+                        
                         {{-- USERNAME --}}
                         <div class="form-floating mb-3">
                             <input type="text"
@@ -87,6 +65,34 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <hr>
+
+                        <h6 class="mb-3">📚 Mapel & Kelas</h6>
+
+                        <div id="mapel-wrapper">
+
+                            <div class="row mb-2 mapel-item">
+                                <div class="col-md-5">
+                                    <input type="text" name="mapel[]" class="form-control" placeholder="Mapel">
+                                    <label>Mapel</label>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" name="kelas[]" class="form-control" placeholder="Kelas">
+                                    <label>Kelas</label>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusMapel(this)">
+                                        ❌
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <button type="button" onclick="tambahMapel()" class="btn btn-sm btn-outline-primary mt-2">
+                            ➕ Tambah Mapel
+                        </button>
 
                         {{-- BUTTON --}}
                         <div class="d-flex justify-content-between mt-4">
@@ -112,6 +118,30 @@
 
 @push('addon-script')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function tambahMapel() {
+        let html = `
+        <div class="row mb-2 mapel-item">
+            <div class="col-md-5">
+                <input type="text" name="mapel[]" class="form-control" placeholder="Mapel">
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="kelas[]" class="form-control" placeholder="Kelas">
+            </div>
+            <div class="col-md-2 d-flex align-items-center">
+                <button type="button" class="btn btn-danger btn-sm" onclick="hapusMapel(this)">
+                    ❌
+                </button>
+            </div>
+        </div>`;
+
+        document.getElementById('mapel-wrapper').insertAdjacentHTML('beforeend', html);
+    }
+
+    function hapusMapel(button) {
+        button.closest('.mapel-item').remove();
+    }
+</script>
 
 @if ($errors->any())
 <script>

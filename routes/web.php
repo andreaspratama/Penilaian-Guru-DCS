@@ -35,6 +35,8 @@ Route::prefix('admin')
 
     // ROUTE SEMUA JAWABAN
     Route::get('all', [PertanyaanController::class, 'allResponse'])->name('allResponse');
+    // DETAIL JAWABAN PER SISWA
+    Route::get('responseDetailPerSiswa/{id}', [PertanyaanController::class, 'detailPerSiswa'])->name('detailPerSiswa');
     // DETAIL JAWABAN
     Route::get('responseDetail/{id}', [PertanyaanController::class, 'responseDetail'])->name('responseDetail');
     // ROUTE PER UNIT SMA
@@ -43,6 +45,9 @@ Route::prefix('admin')
     Route::get('sortBySmp', [PertanyaanController::class, 'sortBySmp'])->name('sortBySmp');
     // ROUTE PER UNIT ELEMENTARY
     Route::get('sortByEle', [PertanyaanController::class, 'sortByEle'])->name('sortByEle');
+
+    // IMPORT EXCEL DATA GURU
+    Route::post('/guru/import', [GuruController::class, 'import'])->name('guru.import');
 });
 
 Route::prefix('student')

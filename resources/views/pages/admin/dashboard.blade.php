@@ -11,12 +11,12 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="stats-icon purple">
-                                                    <i class="iconly-boldShow"></i>
+                                                    <i class="iconly-boldProfile"></i>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
-                                                <h6 class="text-muted font-semibold">Profile Views</h6>
-                                                <h6 class="font-extrabold mb-0">112.000</h6>
+                                                <h6 class="text-muted font-semibold">Guru</h6>
+                                                <h6 class="font-extrabold mb-0">{{ $totalGuru }}</h6>
                                             </div>
                                         </div>
                                     </div>
@@ -32,7 +32,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
-                                                <h6 class="text-muted font-semibold">Followers</h6>
+                                                <h6 class="text-muted font-semibold">Siswa</h6>
                                                 <h6 class="font-extrabold mb-0">183.000</h6>
                                             </div>
                                         </div>
@@ -84,10 +84,6 @@
                                     </div>
                                     <div class="ms-3 name">
                                         <h5 class="font-bold">{{auth()->user()->name}}</h5>
-                                        <form action="{{ route('logout') }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger">Logout</button>
-                                        </form>
                                     </div>
                                 </div>
                             </div>

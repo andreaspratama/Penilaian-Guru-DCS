@@ -14,16 +14,18 @@ class PertanyaanController extends Controller
     {
         $siswa = auth()->user()->siswa;
 
-        // Ambil guru berdasarkan kelas siswa
-        $gurus = Guru::where('kelas', $siswa->kelas)->get();
-
-        // Ambil guru yang sudah dinilai oleh siswa
+        // ✅ Ambil guru yang sudah dinilai siswa ini
         $sudah = Pertanyaansiswa::where('siswa_id', $siswa->id)
-                       ->pluck('guru_id')
-                       ->toArray();
+                        ->pluck('guru_id')
+                        ->toArray();
 
-        // Filter guru yang belum dinilai
-        $gurus = $gurus->whereNotIn('id', $sudah);
+        // ✅ Ambil guru berdasarkan kelas siswa + belum dinilai
+        $gurus = Guru::with('mapelKelas')
+            ->whereHas('mapelKelas', function ($query) use ($siswa) {
+                $query->where('kelas', $siswa->kelas);
+            })
+            ->whereNotIn('id', $sudah)
+            ->get();
 
         return view('pages.siswa.index', compact('gurus'));
     }
@@ -200,7 +202,7 @@ class PertanyaanController extends Controller
                 })
                 ->addColumn('aksi', function ($row) {
                     $detail = '
-                        <a href="'.route('responseDetail', $row->id).'"
+                        <a href="'.url('admin/responseDetailPerSiswa/'.$row->id).'"
                         class="btn btn-sm btn-info rounded-pill px-3">
                         👁️ Detail
                         </a>';
@@ -226,7 +228,7 @@ class PertanyaanController extends Controller
         if ($request->ajax()) {
 
             // Ambil data siswa yang unitnya Elementary saja
-            $data = Pertanyaansiswa::where('unit', 'Elementary')
+            $data = Guru::where('unit_id', 1)
                     ->orderBy('id', 'DESC')
                     ->get();
 
@@ -234,17 +236,18 @@ class PertanyaanController extends Controller
                 ->addIndexColumn()
 
                 ->addColumn('unit_nama', function ($row) {
-                    return $row->unit ?? '-';
-                })
-                ->addColumn('siswa_nama', function ($row) {
-                    return $row->siswa->nama ?? '-';
-                })
-                ->addColumn('guru_nama', function ($row) {
-                    return $row->guru->nama ?? '-';
+                    return $row->unit->nama ?? '-';
                 })
                 ->addColumn('aksi', function ($row) {
+                    $ps = Pertanyaansiswa::where('guru_id', $row->id)->first();
+
+                    if (!$ps) {
+                        return '<button class="btn btn-secondary btn-sm rounded-pill px-3" disabled>
+                                Tidak Ada Data
+                                </button>';
+                    }
                     $detail = '
-                        <a href="'.route('responseDetail', $row->id).'"
+                        <a href="'.route('detailPerSiswa', $ps->id).'"
                         class="btn btn-sm btn-info rounded-pill px-3">
                         👁️ Detail
                         </a>';
@@ -258,10 +261,49 @@ class PertanyaanController extends Controller
                     return $detail . ' ' . $hapus;
                 })
 
-                ->rawColumns(['unit_nama', 'siswa_nama', 'guru_nama', 'aksi'])
+                ->rawColumns(['unit_nama', 'aksi'])
                 ->make(true);
         }
 
         return view('pages.admin.response.sortByEle');
+    }
+
+    public function detailPerSiswa($id)
+    {
+        $header = Pertanyaansiswa::findOrFail($id);
+
+        $datas = Pertanyaansiswa::where('guru_id', $header->guru_id)
+            ->where('kelas', $header->kelas)
+            ->where('unit', $header->unit)
+            ->get();
+
+        $rekap = [];
+
+        for ($i = 1; $i <= 9; $i++) {
+
+            $kolom = "pertanyaan" . $i;
+
+            $nilai = $datas->pluck($kolom)
+                ->filter(function ($v) {
+                    return is_numeric($v);
+                })
+                ->map(function ($v) {
+                    return (int) $v;
+                });
+
+            $rekap[$i] = [
+                'jumlah_pengisi' => $nilai->count(),
+                'total_nilai' => $nilai->sum(),
+                'rata_rata' => $nilai->count() > 0 ? round($nilai->avg(), 2) : 0,
+                'detail_siswa' => $datas->map(function ($d) use ($kolom) {
+                    return [
+                        'nama' => $d->siswa->nama ?? '-',
+                        'nilai' => is_numeric($d->$kolom) ? (int)$d->$kolom : 0
+                    ];
+                })
+            ];
+        }
+
+        return view('pages.admin.response.detailPerSiswa', compact('header','rekap'));
     }
 }
